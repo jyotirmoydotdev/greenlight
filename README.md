@@ -1,5 +1,6 @@
 # Greenlight
 
+
 Greenlight API supports the following endpoints and actions
 
 | Method | URL Pattern                 | Action                                          |
