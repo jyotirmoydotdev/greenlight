@@ -53,28 +53,36 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst int
 		var unmarshalTypeError *json.UnmarshalTypeError
 		var invalidUnmarshalError *json.InvalidUnmarshalError
 		switch {
+
+		// Syntax Error
 		case errors.As(err, &syntaxError):
 			return fmt.Errorf("body contains badly-formed JSON (at character %d)", syntaxError.Offset)
 
+			// Bad JSON
 		case errors.Is(err, io.ErrUnexpectedEOF):
 			return errors.New("body conatins badly-formed JSON")
 
+			// Type Error
 		case errors.As(err, &unmarshalTypeError):
 			if unmarshalTypeError.Field != "" {
 				return fmt.Errorf("body contains incorrect JSON type for field %q", unmarshalTypeError.Field)
 			}
 			return fmt.Errorf("body contains incorrect JSON type (at character %d)", unmarshalTypeError.Offset)
 
+			// Empty Body
 		case errors.Is(err, io.EOF):
 			return errors.New("body must not be empty")
 
+			// Unknown Field
 		case strings.HasPrefix(err.Error(), "json: unknown field"):
 			fieldName := strings.TrimPrefix(err.Error(), "json: unknown field")
 			return fmt.Errorf("body contains unknown key %s", fieldName)
 
+			// Large JSON
 		case err.Error() == "http: request body too large":
 			return fmt.Errorf("body must not be large than %d bytes", maxBytes)
 
+			// Invalid
 		case errors.As(err, &invalidUnmarshalError):
 			panic(err)
 
