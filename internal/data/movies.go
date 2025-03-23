@@ -1,10 +1,15 @@
 package data
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/jyotirmoydotdev/greenlight/internal/validator"
 )
+
+type MovieModel struct{
+  DB *sql.DB
+}
 
 type Movie struct {
 	ID        int64     `json:"id"`
@@ -33,4 +38,20 @@ func ValidateMovie(v *validator.Validator, movie *Movie) {
 
 	v.Check(validator.Unique(movie.Genres), "genres", "must not contain duplicate value")
 
+}
+
+func (m MovieModel) Insert(movie *Movie) error {
+  return nil
+}
+
+func (m MovieModel) Get(id int64) (*Movie, error){
+  return  nil, nil
+}
+
+func (m MovieModel) Update(movie *Movie) error {
+  return nil
+}
+
+func (m MovieModel) Delete(id int64) error {
+  return nil
 }
