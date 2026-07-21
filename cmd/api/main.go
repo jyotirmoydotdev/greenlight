@@ -34,7 +34,7 @@ func main(){
 		logger: logger,
 	}
 	mux := http.NewServeMux()
-	mux.HandleFunc("/v1/healthcheck", app.healthcheckHandler)
+	mux.HandleFunc("/v1/healthcheck", app.healcheckHandler)
 
 	srv := &http.Server{
 		Addr: fmt.Sprintf(":%d", cfg.port),
