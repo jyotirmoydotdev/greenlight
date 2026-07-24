@@ -5,8 +5,11 @@ import (
 	"net/http"
 )
 
-func (app *application) healcheckHandler(w http.ResponseWriter, r *http.Request){
-	fmt.Fprintln(w, "status: availble")
-	fmt.Fprintf(w, "enviroment: %s\n", app.config.env)
-	fmt.Fprintf(w, "version: %s\n", version)
+func (app *application) healcheckHandler(w http.ResponseWriter, r *http.Request) {
+	js := `{"status": "availble", "enviroment": %q , "version": %q }`
+	js = fmt.Sprintf(js, app.config.env, version)
+
+	w.Header().Set("Content-Type", "application/json")
+
+	w.Write([]byte(js))
 }
