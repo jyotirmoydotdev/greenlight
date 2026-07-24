@@ -9,7 +9,7 @@ import (
 )
 
 func (app *application) createMovieHandler(w http.ResponseWriter, r *http.Request){
-	fmt.Fprintf(w, "create a new movie")
+	fmt.Fprintf(w, "create a new movie\n")
 }
 
 func (app *application) showMovieHandler(w http.ResponseWriter, r *http.Request){
