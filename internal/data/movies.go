@@ -9,8 +9,6 @@ import (
 	"github.com/lib/pq"
 )
 
-var ErrRecordNotFound = errors.New("record not found")
-
 type Movie struct {
 	ID        int64     `json:"id"`
 	CreatedAt time.Time `json:"-"`
@@ -36,20 +34,6 @@ func ValidateMovie(v *validator.Validator, movie *Movie) {
 	v.Check(len(movie.Genres) >= 1, "genres", "must contain at least 1 genre")
 	v.Check(len(movie.Genres) <= 5, "genres", "must not contain more than 5 genres")
 	v.Check(validator.Unique(movie.Genres), "genres", "must not contain duplicate values")
-}
-
-type MovieModel struct {
-	DB *sql.DB
-}
-
-type Models struct {
-	Movies MovieModel
-}
-
-func NewModels(db *sql.DB) Models {
-	return Models{
-		Movies: MovieModel{DB: db},
-	}
 }
 
 func (m MovieModel) Insert(movie *Movie) error {
@@ -131,7 +115,7 @@ func (m MovieModel) Update(movie *Movie) error {
 	query := `
 		UPDATE movies 
 		SET title = $1, year = $2, runtime = $3, genres = $4, version = version + 1
-		WHERE id = $5 
+		WHERE id = $5 AND version = $6
 		RETURNING version
 	`
 	args := []any{
@@ -140,9 +124,19 @@ func (m MovieModel) Update(movie *Movie) error {
 		movie.Runtime,
 		pq.Array(movie.Genres),
 		movie.ID,
+		movie.Version,
 	}
 
-	return m.DB.QueryRow(query, args...).Scan(&movie.Version)
+	err := m.DB.QueryRow(query, args...).Scan(&movie.Version)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return ErrEditConflict
+		default:
+			return err
+		}
+	}
+	return nil
 }
 
 func (m MovieModel) Delete(id int64) error {
