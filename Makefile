@@ -1,4 +1,5 @@
 POSTGRES_CONTAINER=postgres
+DATABASE=greenlight
 
 postgres-start:
 	docker start $(POSTGRES_CONTAINER)
@@ -19,4 +20,4 @@ postgres-logs-follow:
 	docker logs -f $(POSTGRES_CONTAINER)
 
 postgres-shell:
-	docker exec -it $(POSTGRES_CONTAINER) psql -U postgres -d $(POSTGRES_CONTAINER)
+	docker exec -it $(POSTGRES_CONTAINER) psql -U $(DATABASE) -d $(DATABASE)
