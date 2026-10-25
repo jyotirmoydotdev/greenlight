@@ -11,7 +11,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/go-playground/locales/kea"
 	"github.com/julienschmidt/httprouter"
 	"github.com/jyotirmoydotdev/greenlight/internal/validator"
 )
@@ -89,7 +88,7 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst any
 func (app *application) readString(qs url.Values, key string, defaultValues string) string {
 	s := qs.Get(key)
 
-	if s == ""{
+	if s == "" {
 		return defaultValues
 	}
 
@@ -114,7 +113,6 @@ func (app *application) readInt(qs url.Values, key string, defaultValue int, v *
 	}
 
 	i, err := strconv.Atoi(s)
-
 	if err != nil {
 		v.AddError(key, "must be an integer value")
 		return defaultValue
