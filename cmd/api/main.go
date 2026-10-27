@@ -25,6 +25,11 @@ type config struct {
 		maxIdelConns int
 		MaxIdelTime  string
 	}
+	limiter struct {
+		rps     float64
+		brust   int
+		enabled bool
+	}
 }
 
 type application struct {
@@ -43,6 +48,10 @@ func main() {
 	flag.IntVar(&cfg.db.maxOpenConns, "db-max-open-conns", 25, "PostgreSQL max open connections")
 	flag.IntVar(&cfg.db.maxIdelConns, "db-max-idel-conns", 25, "PostgreSQL max idle connections")
 	flag.StringVar(&cfg.db.MaxIdelTime, "db-max-idle-time", "15m", "PostgreSQL max connections idle time")
+
+	flag.Float64Var(&cfg.limiter.rps, "limiter-rps", 2, "Rate limiter maximum requests per second")
+	flag.IntVar(&cfg.limiter.brust, "limiter-burst", 4, "Rate limiter maximum brust")
+	flag.BoolVar(&cfg.limiter.enabled, "limiter-enabled", true, "Enable rate limiter")
 
 	flag.Parse()
 
@@ -72,8 +81,8 @@ func main() {
 	}
 
 	logger.PrintInfo("statring server", map[string]string{
-		"addr" : srv.Addr,
-		"env" : cfg.env,
+		"addr": srv.Addr,
+		"env":  cfg.env,
 	})
 
 	err = srv.ListenAndServe()
